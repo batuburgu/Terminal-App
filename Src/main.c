@@ -3,14 +3,11 @@
 #include <stdlib.h>
 #include <string.h> 
 #include <stdbool.h>
+#include "main.h"
 #include "action_handler.h"
 #include "hash_table.h"
 
-//Linked List Structure
-typedef struct Node{
-    char data;
-    struct Node* next;
-} Node;
+const char help_command [6] = "--help";
 
 //Linked List Creator
 Node* createNode(char data)
@@ -24,56 +21,73 @@ Node* createNode(char data)
 
 int parse_action_data(Node* head)
 {
-    Node * temp = head;
+    Node* temp = head;
+    Node* start_of_input = NULL;
+    Action* pointer_to_action = NULL; 
     char tmp_array[10];
     int i = 0;
-    Action* pointer_to_action = NULL; 
+    int command_flag = 0;
 
     // Parsing console input searching the action in the hash map
     while(temp->next != NULL)
     {   
-        if (temp->data == ' ')
+        if (temp->data == ' ' || temp->next->next == NULL)
         {
-            char exact_input[i];
-            for (int j = 0; j < i; j++)
+            // End of Input Check
+            if (temp->next->next == NULL)
             {
-                exact_input[j] = tmp_array[j];
+                tmp_array[i] = temp->next->data;
+                tmp_array[i+1] = '\0';
             }
-        
+            else tmp_array[i] = '\0';
+
             // Lowercase number
-            if ('a' <= exact_input[0] && exact_input[0] <='z')
+            if ('a' <= tmp_array[0] && tmp_array[0] <='z' && command_flag == 0)
             {
-                printf("%s",exact_input);
-                pointer_to_action = hash_table_lookup(exact_input);
+                pointer_to_action = hash_table_lookup(tmp_array);
                 if (pointer_to_action == NULL)
                 {
-                    printf("Wrong Input!");
+                    printf("No such command found!\n");
+                    i = 0; 
+                    return 0;
                 }
                 else
                 {
-                    printf("Found command: %s", pointer_to_action->action_name);
+                    printf("Found command: %s\n", pointer_to_action->action_name);
+                    start_of_input = temp->next;
+                    i = 0; // Reading new word to tmp_array
+                    temp = temp->next;
+                    command_flag = 1;    
                 }
-
+            }
+            // Checking for --help 
+            else if (command_flag == 1)
+            {
+                for (int j = 0; j < i; j++)
+                {
+                    if (tmp_array[j] != help_command[j])
+                    {
+                        int function = pointer_to_action->action_handler(start_of_input);
+                        return 1;
+                    }       
+                } 
+                int function = pointer_to_action->action_helper();
+                return 1;   
             }
             else
             {
-                printf("Wrong Input!");
+                printf("Wrong Input!\n");
+                return 0;
             }
-            continue;
         }
         else
         {
             tmp_array[i] = temp->data;
             temp = temp->next;
             i++;
-        }
-       
-      
+        }    
     }
-
-    return 0;
 }
-
 
 int main(void)
 {
@@ -116,9 +130,8 @@ int main(void)
         
         if (c == 10)
         {
-            parse_action_data(head);
+            arg_count = 0;
+            parse_action_data(head);   
         }
-    } 
-    
-    
+    }  
 }
