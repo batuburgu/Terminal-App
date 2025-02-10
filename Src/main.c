@@ -3,12 +3,12 @@
 #include <stdlib.h>
 #include <string.h> 
 #include <stdbool.h>
+#include <conio.h>
 #include "main.h"
 #include "action_handler.h"
 #include "hash_table.h"
 
 const char help_command [6] = "--help";
-
 //Linked List Creator
 Node* createNode(char data)
 {
@@ -48,6 +48,7 @@ int parse_action_data(Node* head)
                 if (pointer_to_action == NULL)
                 {
                     printf("No such command found!\n");
+                    printf("Given Command: %s", tmp_array);
                     i = 0; 
                     return 0;
                 }
@@ -92,9 +93,11 @@ int parse_action_data(Node* head)
 int main(void)
 {
     char c;
+    char c_prev = ' ';
     int arg_count = 0;
     Node* head = NULL;
     Node* temp = NULL;
+    Node * prev_temp = NULL;
     
     // Action Definitions
     Action add = {.action_handler =&add_function, .action_name = "add", .action_helper = &add_helper_function};
@@ -113,25 +116,48 @@ int main(void)
     
     while (1)
     {
-        c = getchar();
-        arg_count++;
+        c = getch();
+        arg_count++;                
 
-        // Taking the terminal input to a LinkedList
-        if (arg_count == 1)
-        {
-            head = createNode(c);
-            temp = head;
+        if (c == 8) 
+        {   
+            printf("\b \b"); // Backspace
+            temp = temp->prev;
+            temp->next = NULL;
+
         }
-        else
+        else if (c == 3) return 0; // Ctrl + C to exit
+        // List possibilities
+        else if (c == 9 && c_prev == 9)
         {
-            temp->next = createNode(c);
-            temp = temp->next;
+            printf("Tabtab");
         }
-        
-        if (c == 10)
+        else if (c == 9)
+        {
+            c_prev = c;
+        }  
+        else if (c == 13)
         {
             arg_count = 0;
             parse_action_data(head);   
         }
+        else
+        {
+            if (arg_count == 1)
+            {
+                head = createNode(c);
+                temp = head;
+            }
+            else
+            {
+                temp->next = createNode(c);
+                temp->next->prev = temp;
+                temp = temp->next;
+            }
+            printf("%c",temp->data);
+        }
+
+        
+        
     }  
 }
