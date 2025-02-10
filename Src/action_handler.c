@@ -9,11 +9,6 @@ int add_function(Node *head)
 {
     Node* temp = head;
     printf("Add Function\n");
-    while (temp->next != NULL)
-    {
-        printf("%c", temp->data);
-        temp = temp->next;
-    }
     return 0;
 }
 
