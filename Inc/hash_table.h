@@ -1,7 +1,7 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
-#define MAX_ACTION_NAME_LENGTH 10
+#define MAX_ACTION_NAME_LENGTH 20
 #define HASH_TABLE_SIZE 14
 
 typedef struct Action{

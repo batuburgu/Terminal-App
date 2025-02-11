@@ -10,6 +10,54 @@
 
 const char help_command [6] = "--help";
 
+int list_possible_actions(Node* head, Action* actions[NUMBER_OF_ACTIONS])
+{
+    Node* temp = head;
+    char tmp_array[MAX_ACTION_NAME_LENGTH];
+    int flag = 1; // print command flag
+    int i = 0;
+
+    printf("\nPossible commands:\n");   
+
+    while (temp->next != NULL)
+    {
+        if (temp->next->next == NULL)
+        {
+            tmp_array[i] = temp->data;
+            tmp_array[++i] = temp->next->data;
+            tmp_array[i+1] = '\0';
+            temp = temp->next;
+        }
+        else
+        {
+            tmp_array[i] = temp->data;
+            temp = temp->next;
+            i++;
+        }
+    }
+    for (int j = 0; j < NUMBER_OF_ACTIONS; j++)
+    {
+        flag = 1; // print the command if 1 
+        for (int k = 0; k < (int) strlen(tmp_array); k++)
+        {
+            if (k > (int) strlen(actions[j]->action_name)) // input is longer than command
+            {
+                flag = 0;
+            }
+            else if(tmp_array[k] != actions[j]->action_name[k]) // check for letter difference
+            {   
+                flag = 0;
+            }
+        }
+        if (flag)
+        {
+            printf("%s ",actions[j]->action_name);
+        }   
+    }
+    printf("\n"); // new input line
+    return 0;     
+}
+
 //Linked List Creator
 Node* createNode(char data)
 {
@@ -25,7 +73,7 @@ int parse_action_data(Node* head)
     Node* temp = head;
     Node* start_of_input = NULL;
     Action* pointer_to_action = NULL; 
-    char tmp_array[10];
+    char tmp_array[MAX_ACTION_NAME_LENGTH];
     int i = 0;
     int command_flag = 0;
 
@@ -62,7 +110,7 @@ int parse_action_data(Node* head)
                     temp = temp->next;
                     command_flag = 1;    
                     
-                    if (strcmp(pointer_to_action->action_name, "clear") == 0) // Check clear
+                    if (strcmp(pointer_to_action->action_name, "clear") == 0) // clear command
                     {
                         int function = pointer_to_action->action_helper();
                         return 1;
@@ -105,13 +153,21 @@ int main(void)
     int arg_count = 0;
     Node* head = NULL;
     Node* temp = NULL;
-
+    
     // Action Definitions
-    Action add = {.action_handler =&add_function, .action_name = "add", .action_helper = &add_helper_function};
-    Action subs = {.action_handler =&subs_function, .action_name = "subs", .action_helper = &subs_helper_function};
-    Action multi = {.action_handler =&multi_function, .action_name = "multi", .action_helper = &multi_helper_function};
-    Action div = {.action_handler =&div_function, .action_name = "div", .action_helper = &div_helper_function};
-    Action clear = {.action_handler =NULL, .action_name = "clear", .action_helper =&clear_console};
+    Action add = {.action_handler = &add_function, .action_name = "add", .action_helper = &add_helper_function};
+    Action addition = {.action_handler = &add_function, .action_name = "addition", .action_helper = &add_helper_function};
+    Action subs = {.action_handler = &subs_function, .action_name = "subs", .action_helper = &subs_helper_function};
+    Action substraction = {.action_handler = &subs_function, .action_name = "substraction", .action_helper = &subs_helper_function};
+    Action multi = {.action_handler = &multi_function, .action_name = "multi", .action_helper = &multi_helper_function};
+    Action multiple = {.action_handler = &multi_function, .action_name = "multiple", .action_helper = &multi_helper_function};
+    Action multiplication = {.action_handler = &multi_function, .action_name = "multiplication", .action_helper = &multi_helper_function};
+    Action div = {.action_handler = &div_function, .action_name = "div", .action_helper = &div_helper_function};
+    Action divide = {.action_handler = &div_function, .action_name = "divide", .action_helper = &div_helper_function};
+    Action division = {.action_handler = &div_function, .action_name = "division", .action_helper = &div_helper_function};
+    Action clear = {.action_handler = NULL, .action_name = "clear", .action_helper = &clear_console};
+
+    Action* actions [NUMBER_OF_ACTIONS] = {&add,&addition, &subs, &substraction, &multi, &multiple, &multiplication, &div, &divide, &division, &clear};
     
     // Initializing the hash table
     init_hash_table(); 
@@ -138,9 +194,9 @@ int main(void)
         else if (c == 3) return 0; // Ctrl + C to exit
         else if (c == 9 && c_prev == 9) // List possibilities
         {
-            printf("Tabtab");
+            list_possible_actions(head, actions);
+            c_prev = ' ';
         }
-        
         else if (c == 9) // Tab
         {
             c_prev = c;
@@ -165,6 +221,5 @@ int main(void)
             }
             printf("%c",temp->data);
         }
-    }
-    return 0;  
+    }  
 }
