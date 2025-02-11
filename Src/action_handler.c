@@ -54,4 +54,8 @@ int div_helper_function()
     return 0;
 }
 
-
+int clear_console(void)
+{
+    system("cls");
+    return 1;
+}

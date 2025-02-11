@@ -9,6 +9,7 @@
 #include "hash_table.h"
 
 const char help_command [6] = "--help";
+
 //Linked List Creator
 Node* createNode(char data)
 {
@@ -36,7 +37,8 @@ int parse_action_data(Node* head)
             // End of Input Check
             if (temp->next->next == NULL)
             {
-                tmp_array[i] = temp->next->data;
+                tmp_array[i] = temp->data;
+                tmp_array[++i] = temp->next->data;
                 tmp_array[i+1] = '\0';
             }
             else tmp_array[i] = '\0';
@@ -59,8 +61,14 @@ int parse_action_data(Node* head)
                     i = 0; // Reading new word to tmp_array
                     temp = temp->next;
                     command_flag = 1;    
+                    
+                    if (strcmp(pointer_to_action->action_name, "clear") == 0) // Check clear
+                    {
+                        int function = pointer_to_action->action_helper();
+                        return 1;
+                    }
                 }
-            }
+            }            
             // Checking for --help 
             else if (command_flag == 1)
             {
@@ -97,13 +105,13 @@ int main(void)
     int arg_count = 0;
     Node* head = NULL;
     Node* temp = NULL;
-    Node * prev_temp = NULL;
-    
+
     // Action Definitions
     Action add = {.action_handler =&add_function, .action_name = "add", .action_helper = &add_helper_function};
     Action subs = {.action_handler =&subs_function, .action_name = "subs", .action_helper = &subs_helper_function};
     Action multi = {.action_handler =&multi_function, .action_name = "multi", .action_helper = &multi_helper_function};
     Action div = {.action_handler =&div_function, .action_name = "div", .action_helper = &div_helper_function};
+    Action clear = {.action_handler =NULL, .action_name = "clear", .action_helper =&clear_console};
     
     // Initializing the hash table
     init_hash_table(); 
@@ -113,35 +121,36 @@ int main(void)
     hash_table_insert(&subs);
     hash_table_insert(&multi);
     hash_table_insert(&div);
+    hash_table_insert(&clear);
     
     while (1)
     {
         c = getch();
         arg_count++;                
-
-        if (c == 8) 
+        
+        if (c == 8) // Backspace
         {   
-            printf("\b \b"); // Backspace
+            printf("\b \b"); 
             temp = temp->prev;
             temp->next = NULL;
 
         }
         else if (c == 3) return 0; // Ctrl + C to exit
-        // List possibilities
-        else if (c == 9 && c_prev == 9)
+        else if (c == 9 && c_prev == 9) // List possibilities
         {
             printf("Tabtab");
         }
-        else if (c == 9)
+        
+        else if (c == 9) // Tab
         {
             c_prev = c;
         }  
-        else if (c == 13)
+        else if (c == 13) // Enter
         {
             arg_count = 0;
             parse_action_data(head);   
         }
-        else
+        else // Save the char
         {
             if (arg_count == 1)
             {
@@ -156,8 +165,6 @@ int main(void)
             }
             printf("%c",temp->data);
         }
-
-        
-        
-    }  
+    }
+    return 0;  
 }
