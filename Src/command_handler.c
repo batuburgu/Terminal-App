@@ -5,56 +5,55 @@
 #include "main.h"
 #include "hash_table.h"
 
-int add_function(Node *head)
+int add_function(char* pointer_array)
 {
-    Node* temp = head;
     printf("Add Function\n");
     return 0;
 }
 
-int add_helper_function()
+int add_helper_function(char* pointer_array)
 {
     printf("Add Helper Function");
     return 0;
 }
 
-int subs_function(Node *head)
+int subs_function(char* pointer_array)
 {
     printf("Subs Function");
     return 0;
 }
 
-int subs_helper_function()
+int subs_helper_function(char* pointer_array)
 {
     printf("Subs Helper Function");
     return 0;
 }
 
-int multi_function(Node *head)
+int multi_function(char* pointer_array)
 {
     printf("Multi function");
     return 0;
 }
 
-int multi_helper_function()
+int multi_helper_function(char* pointer_array)
 {
     printf("Multi Helper Function");
     return 0;
 }
 
-int div_function(Node *head)
+int div_function(char* pointer_array)
 {
     printf("Div function");
     return 0;
 }
 
-int div_helper_function()
+int div_helper_function(char* pointer_array)
 {
     printf("Div Helper Function");
     return 0;
 }
 
-int clear_console(void)
+int clear_console(char* pointer_array)
 {
     system("cls");
     return 1;

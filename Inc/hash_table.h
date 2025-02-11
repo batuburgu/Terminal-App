@@ -1,20 +1,21 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
-#define MAX_ACTION_NAME_LENGTH 20
-#define HASH_TABLE_SIZE 14
+#define MAX_Command_NAME_LENGTH 20
+#define HASH_TABLE_SIZE 19
+#define MAX_INPUT_SIZE 200
 
-typedef struct Action{
-    int (*action_handler)(Node* head);
-    char action_name[MAX_ACTION_NAME_LENGTH];
-    int (*action_helper)(void);
-}Action;
+typedef struct Command{
+    int (*command_handler)(char* pointer_array[MAX_INPUT_SIZE]);
+    char command_name[MAX_Command_NAME_LENGTH];
+    int (*command_helper)(char* pointer_array[MAX_INPUT_SIZE]);
+}Command;
 
-extern Action * hash_table[HASH_TABLE_SIZE];
+extern Command * hash_table[HASH_TABLE_SIZE];
 
-int hash(char* action_name);
+int hash(const char* Command_name);
 int init_hash_table(void);
-int hash_table_insert(Action* p);
-Action* hash_table_lookup(char* action_name);
+int hash_table_insert(const Command* p);
+Command* hash_table_lookup(char* Command_name);
 
 #endif

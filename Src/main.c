@@ -5,15 +5,39 @@
 #include <stdbool.h>
 #include <conio.h>
 #include "main.h"
-#include "action_handler.h"
+#include "command_handler.h"
 #include "hash_table.h"
+
+#define CTRLC 3
+#define BACKSPACE 8
+#define TAB 9
+#define ENTER 13
+
+char input_array[MAX_INPUT_SIZE];
+
+// Command Definitions
+const Command add = {.command_handler = &add_function, .command_name = "add", .command_helper = &add_helper_function};
+const Command addition = {.command_handler = &add_function, .command_name = "addition", .command_helper = &add_helper_function};
+const Command subs = {.command_handler = &subs_function, .command_name = "subs", .command_helper = &subs_helper_function};
+const Command substrcommand = {.command_handler = &subs_function, .command_name = "substrcommand", .command_helper = &subs_helper_function};
+const Command multi = {.command_handler = &multi_function, .command_name = "multi", .command_helper = &multi_helper_function};
+const Command multiple = {.command_handler = &multi_function, .command_name = "multiple", .command_helper = &multi_helper_function};
+const Command multiplication = {.command_handler = &multi_function, .command_name = "multiplication", .command_helper = &multi_helper_function};
+const Command divd = {.command_handler = &div_function, .command_name = "divd", .command_helper = &div_helper_function};
+const Command divide = {.command_handler = &div_function, .command_name = "divide", .command_helper = &div_helper_function};
+const Command division = {.command_handler = &div_function, .command_name = "division", .command_helper = &div_helper_function};
+const Command clear = {.command_handler = NULL, .command_name = "clear", .command_helper = &clear_console};
+
+Command* commands [] = {&add,&addition, &subs, &substrcommand, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear};
+
+#define NUMBER_OF_COMMANDS sizeof(commands)
 
 const char help_command [6] = "--help";
 
-int list_possible_actions(Node* head, Action* actions[NUMBER_OF_ACTIONS])
+/*int list_possible_commands(char input_array[MAX_INPUT_SIZE], command* commands[NUMBER_OF_COMMANDS])
 {
     Node* temp = head;
-    char tmp_array[MAX_ACTION_NAME_LENGTH];
+    char tmp_array[MAX_command_NAME_LENGTH];
     int flag = 1; // print command flag
     int i = 0;
 
@@ -35,115 +59,106 @@ int list_possible_actions(Node* head, Action* actions[NUMBER_OF_ACTIONS])
             i++;
         }
     }
-    for (int j = 0; j < NUMBER_OF_ACTIONS; j++)
+    for (int j = 0; j < NUMBER_OF_commandS; j++)
     {
         flag = 1; // print the command if 1 
         for (int k = 0; k < (int) strlen(tmp_array); k++)
         {
-            if (k > (int) strlen(actions[j]->action_name)) // input is longer than command
+            if (k > (int) strlen(commands[j]->command_name)) // input is longer than command
             {
                 flag = 0;
             }
-            else if(tmp_array[k] != actions[j]->action_name[k]) // check for letter difference
+            else if(tmp_array[k] != commands[j]->command_name[k]) // check for letter difference
             {   
                 flag = 0;
             }
         }
         if (flag)
         {
-            printf("%s ",actions[j]->action_name);
+            printf("%s ",commands[j]->command_name);
         }   
     }
     printf("\n"); // new input line
     return 0;     
-}
+}*/
 
-//Linked List Creator
-Node* createNode(char data)
+int parse_command_data(char input_array[MAX_INPUT_SIZE])
 {
-    Node *new_node = (Node *) malloc(sizeof(Node));
-    
-    new_node->data = data;
-    new_node->next = NULL;
-    return new_node;
-}
-
-int parse_action_data(Node* head)
-{
-    Node* temp = head;
-    Node* start_of_input = NULL;
-    Action* pointer_to_action = NULL; 
-    char tmp_array[MAX_ACTION_NAME_LENGTH];
+    Command* pointer_to_command = NULL; 
+    char* pointer_array[MAX_INPUT_SIZE];
+    int pointer_index = 0;
     int i = 0;
     int command_flag = 0;
 
-    // Parsing console input searching the action in the hash map
-    while(temp->next != NULL)
-    {   
-        if (temp->data == ' ' || temp->next->next == NULL)
+    // Parsing console input and taking the pointers of the letters after spaces
+    if (i != 0)
+    {
+        if (input_array[i] == ' ')
         {
-            // End of Input Check
-            if (temp->next->next == NULL)
-            {
-                tmp_array[i] = temp->data;
-                tmp_array[++i] = temp->next->data;
-                tmp_array[i+1] = '\0';
-            }
-            else tmp_array[i] = '\0';
-
-            // Lowercase number
-            if ('a' <= tmp_array[0] && tmp_array[0] <='z' && command_flag == 0)
-            {
-                pointer_to_action = hash_table_lookup(tmp_array);
-                if (pointer_to_action == NULL)
-                {
-                    printf("No such command found!\n");
-                    printf("Given Command: %s", tmp_array);
-                    i = 0; 
-                    return 0;
-                }
-                else
-                {
-                    printf("Found command: %s\n", pointer_to_action->action_name);
-                    start_of_input = temp->next;
-                    i = 0; // Reading new word to tmp_array
-                    temp = temp->next;
-                    command_flag = 1;    
-                    
-                    if (strcmp(pointer_to_action->action_name, "clear") == 0) // clear command
-                    {
-                        int function = pointer_to_action->action_helper();
-                        return 1;
-                    }
-                }
-            }            
-            // Checking for --help 
-            else if (command_flag == 1)
-            {
-                for (int j = 0; j < i; j++)
-                {
-                    if (tmp_array[j] != help_command[j])
-                    {
-                        int function = pointer_to_action->action_handler(start_of_input);
-                        return 1;
-                    }       
-                } 
-                int function = pointer_to_action->action_helper();
-                return 1;   
-            }
-            else
-            {
-                printf("Wrong Input!\n");
-                return 0;
-            }
+            pointer_array[pointer_index] = &input_array[++i];
+            pointer_index++;
         }
         else
         {
-            tmp_array[i] = temp->data;
-            temp = temp->next;
             i++;
-        }    
+        }
     }
+    else
+    {
+        pointer_array[pointer_index] = &input_array[0];
+        i++;
+        pointer_index++; 
+    }
+
+    if (command_flag == 0) // Check for command
+    {
+        int command_word_length = pointer_array[1] - pointer_array[0];
+        printf("%p - %p",pointer_array[2], pointer_array[1]);
+        char tmp_array [command_word_length];
+        
+        for (int j = 0; j < command_word_length; j++)
+        {
+            tmp_array[j] = input_array[j];
+            printf("%c",input_array[j]);
+        }
+        pointer_to_command = hash_table_lookup(tmp_array);
+        if (pointer_to_command == NULL)
+        {
+            printf("No such command found!\n");
+            printf("Given Command: %s", tmp_array);
+            i = 0; 
+            return 0;
+        }
+        else
+        {
+            printf("Found command: %s\n", pointer_to_command->command_name);
+            command_flag = 1;    
+            
+        }     
+    }
+    else if (command_flag == 1) // Check for --help
+    {
+        int help_word_length = pointer_array[2] - pointer_array[1];
+        char tmp_array [help_word_length];
+        
+        for (int j = 0; j < help_word_length; j++)
+        {
+            tmp_array[j] = input_array[j];
+        }
+
+        if (strcmp(tmp_array, "--help") == 0)
+        {
+            pointer_to_command->command_helper(pointer_array);
+        }
+        else
+        {
+            pointer_to_command->command_handler(pointer_array);
+        }
+        
+    }
+    
+    
+    
 }
 
 int main(void)
@@ -151,23 +166,6 @@ int main(void)
     char c;
     char c_prev = ' ';
     int arg_count = 0;
-    Node* head = NULL;
-    Node* temp = NULL;
-    
-    // Action Definitions
-    Action add = {.action_handler = &add_function, .action_name = "add", .action_helper = &add_helper_function};
-    Action addition = {.action_handler = &add_function, .action_name = "addition", .action_helper = &add_helper_function};
-    Action subs = {.action_handler = &subs_function, .action_name = "subs", .action_helper = &subs_helper_function};
-    Action substraction = {.action_handler = &subs_function, .action_name = "substraction", .action_helper = &subs_helper_function};
-    Action multi = {.action_handler = &multi_function, .action_name = "multi", .action_helper = &multi_helper_function};
-    Action multiple = {.action_handler = &multi_function, .action_name = "multiple", .action_helper = &multi_helper_function};
-    Action multiplication = {.action_handler = &multi_function, .action_name = "multiplication", .action_helper = &multi_helper_function};
-    Action div = {.action_handler = &div_function, .action_name = "div", .action_helper = &div_helper_function};
-    Action divide = {.action_handler = &div_function, .action_name = "divide", .action_helper = &div_helper_function};
-    Action division = {.action_handler = &div_function, .action_name = "division", .action_helper = &div_helper_function};
-    Action clear = {.action_handler = NULL, .action_name = "clear", .action_helper = &clear_console};
-
-    Action* actions [NUMBER_OF_ACTIONS] = {&add,&addition, &subs, &substraction, &multi, &multiple, &multiplication, &div, &divide, &division, &clear};
     
     // Initializing the hash table
     init_hash_table(); 
@@ -176,50 +174,40 @@ int main(void)
     hash_table_insert(&add);
     hash_table_insert(&subs);
     hash_table_insert(&multi);
-    hash_table_insert(&div);
+    hash_table_insert(&divd);
     hash_table_insert(&clear);
     
     while (1)
     {
-        c = getch();
-        arg_count++;                
+        c = getch();               
         
-        if (c == 8) // Backspace
+        if (c == BACKSPACE) // Backspace
         {   
             printf("\b \b"); 
-            temp = temp->prev;
-            temp->next = NULL;
+            input_array[arg_count] = ' ';
+            arg_count --;
 
         }
-        else if (c == 3) return 0; // Ctrl + C to exit
-        else if (c == 9 && c_prev == 9) // List possibilities
+        else if (c == CTRLC) return 0; // Ctrl + C to exit
+        else if (c == TAB && c_prev == TAB) // List possibilities
         {
-            list_possible_actions(head, actions);
-            c_prev = ' ';
+            //list_possible_commands(input_array, commands);
+            c_prev = ' ';   
         }
-        else if (c == 9) // Tab
+        else if (c == TAB) // Tab
         {
             c_prev = c;
         }  
-        else if (c == 13) // Enter
+        else if (c == ENTER) // Enter
         {
             arg_count = 0;
-            parse_action_data(head);   
+            parse_command_data(input_array);   
         }
         else // Save the char
         {
-            if (arg_count == 1)
-            {
-                head = createNode(c);
-                temp = head;
-            }
-            else
-            {
-                temp->next = createNode(c);
-                temp->next->prev = temp;
-                temp = temp->next;
-            }
-            printf("%c",temp->data);
+            input_array[arg_count] = c;
+            printf("%c",input_array[arg_count]);
+            arg_count++;
         }
     }  
 }

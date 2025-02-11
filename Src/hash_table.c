@@ -6,7 +6,7 @@
 
 Action* hash_table[HASH_TABLE_SIZE];
 
-int hash(char* action_name)
+int hash(const char* action_name)
 {
     int length = strlen(action_name);
     int hash_value = 0;
@@ -27,7 +27,7 @@ int init_hash_table(void)
     return 1;
 }
 
-int hash_table_insert(Action* p)
+int hash_table_insert(const Action* p)
 {
     if (p == NULL)
     {
