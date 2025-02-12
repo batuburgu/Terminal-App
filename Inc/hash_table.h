@@ -1,13 +1,13 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
-#define MAX_Command_NAME_LENGTH 20
+#define MAX_COMMAND_NAME_LENGTH 20
 #define HASH_TABLE_SIZE 19
 #define MAX_INPUT_SIZE 200
 
 typedef struct Command{
     int (*command_handler)(char* pointer_array[MAX_INPUT_SIZE]);
-    char command_name[MAX_Command_NAME_LENGTH];
+    const char command_name[MAX_COMMAND_NAME_LENGTH];
     int (*command_helper)(char* pointer_array[MAX_INPUT_SIZE]);
 }Command;
 

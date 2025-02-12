@@ -8,79 +8,113 @@
 #include "command_handler.h"
 #include "hash_table.h"
 
-#define CTRLC 3
-#define BACKSPACE 8
-#define TAB 9
-#define ENTER 13
+#define CTRLC_ASCII 3
+#define BACKSPACE_ASCII 8
+#define TAB_ASCII 9
+#define ENTER_ASCII 13
+#define HELP_WORD_LENGTH 6
+
+#define DEBUG_ENABLE 0
+#if (DEBUG_ENABLE == 1)
+    #define printD(str1, str2) do{ \
+        printf("\nFile:%s->", __FILE__);\
+        printf("Line:%d->", __LINE__);\
+        printf("Func:%s->", __func__);\
+        printf("%s:%s\n", str1,str2);\
+    }while(0)
+#else
+    #define printD(str1, str2) do{} while(0)
+#endif
+
 
 char input_array[MAX_INPUT_SIZE];
 
 // Command Definitions
-const Command add = {.command_handler = &add_function, .command_name = "add", .command_helper = &add_helper_function};
-const Command addition = {.command_handler = &add_function, .command_name = "addition", .command_helper = &add_helper_function};
-const Command subs = {.command_handler = &subs_function, .command_name = "subs", .command_helper = &subs_helper_function};
-const Command substrcommand = {.command_handler = &subs_function, .command_name = "substrcommand", .command_helper = &subs_helper_function};
-const Command multi = {.command_handler = &multi_function, .command_name = "multi", .command_helper = &multi_helper_function};
-const Command multiple = {.command_handler = &multi_function, .command_name = "multiple", .command_helper = &multi_helper_function};
-const Command multiplication = {.command_handler = &multi_function, .command_name = "multiplication", .command_helper = &multi_helper_function};
-const Command divd = {.command_handler = &div_function, .command_name = "divd", .command_helper = &div_helper_function};
-const Command divide = {.command_handler = &div_function, .command_name = "divide", .command_helper = &div_helper_function};
-const Command division = {.command_handler = &div_function, .command_name = "division", .command_helper = &div_helper_function};
-const Command clear = {.command_handler = NULL, .command_name = "clear", .command_helper = &clear_console};
+Command add = {.command_handler = &add_function, .command_name = "add", .command_helper = &add_helper_function};
+Command addition = {.command_handler = &add_function, .command_name = "addition", .command_helper = &add_helper_function};
+Command subs = {.command_handler = &subs_function, .command_name = "subs", .command_helper = &subs_helper_function};
+Command substract = {.command_handler = &subs_function, .command_name = "substract", .command_helper = &subs_helper_function};
+Command multi = {.command_handler = &multi_function, .command_name = "multi", .command_helper = &multi_helper_function};
+Command multiple = {.command_handler = &multi_function, .command_name = "multiple", .command_helper = &multi_helper_function};
+Command multiplication = {.command_handler = &multi_function, .command_name = "multiplication", .command_helper = &multi_helper_function};
+Command divd = {.command_handler = &div_function, .command_name = "divd", .command_helper = &div_helper_function};
+Command divide = {.command_handler = &div_function, .command_name = "divide", .command_helper = &div_helper_function};
+Command division = {.command_handler = &div_function, .command_name = "division", .command_helper = &div_helper_function};
+Command clear = {.command_handler = &clear_function, .command_name = "clear", .command_helper = &clear_helper_function};
 
-Command* commands [] = {&add,&addition, &subs, &substrcommand, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear};
+Command* commands [] = {&add, &addition, &subs, &substract, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear};
 
 #define NUMBER_OF_COMMANDS sizeof(commands)
 
 const char help_command [6] = "--help";
 
-/*int list_possible_commands(char input_array[MAX_INPUT_SIZE], command* commands[NUMBER_OF_COMMANDS])
+char* list_possible_commands(char input_array[MAX_INPUT_SIZE], Command* commands[NUMBER_OF_COMMANDS], int* arg_count)
 {
-    Node* temp = head;
-    char tmp_array[MAX_command_NAME_LENGTH];
-    int flag = 1; // print command flag
-    int i = 0;
+    int possible_commands [NUMBER_OF_COMMANDS];
+    for (int i = 0; i < (int) NUMBER_OF_COMMANDS; i++)
+    {
+        possible_commands[i] = 1;
+    }
+     
+    int sum = 0;
+    int indexes [5];
 
     printf("\nPossible commands:\n");   
-
-    while (temp->next != NULL)
+    for (int j = 0; j < (int) NUMBER_OF_COMMANDS; j++)
     {
-        if (temp->next->next == NULL)
-        {
-            tmp_array[i] = temp->data;
-            tmp_array[++i] = temp->next->data;
-            tmp_array[i+1] = '\0';
-            temp = temp->next;
-        }
-        else
-        {
-            tmp_array[i] = temp->data;
-            temp = temp->next;
-            i++;
-        }
-    }
-    for (int j = 0; j < NUMBER_OF_commandS; j++)
-    {
-        flag = 1; // print the command if 1 
-        for (int k = 0; k < (int) strlen(tmp_array); k++)
+        for (int k = 0; k < (int) strlen(input_array); k++)
         {
             if (k > (int) strlen(commands[j]->command_name)) // input is longer than command
             {
-                flag = 0;
+                printD("Input is longer than command:",commands[j]->command_name);
+                possible_commands[j] = 0;
             }
-            else if(tmp_array[k] != commands[j]->command_name[k]) // check for letter difference
+            else if(input_array[k] != commands[j]->command_name[k]) // check for letter difference
             {   
-                flag = 0;
+                printD("Letter difference:",commands[j]->command_name);
+                possible_commands[j] = 0;
             }
         }
-        if (flag)
+        if (possible_commands[j] == 1)
         {
+            indexes[sum] = j;
+            sum++;
             printf("%s ",commands[j]->command_name);
-        }   
+        }           
     }
-    printf("\n"); // new input line
-    return 0;     
-}*/
+
+    printf("\n->");
+
+    if (sum == 0)
+    {
+        printf("No possible commands found!\n");
+        for (int i = 0; i < (int) strlen(input_array); i++)
+        {
+            printf("%c",input_array[i]);
+        }
+    } 
+    else if (sum == 1) 
+    {
+        int index = indexes[0];
+        int wordlength = strlen(commands[index]->command_name);
+        for (int i = 0; i < wordlength; i++)
+        {
+            input_array[i] = commands[index]->command_name[i];
+            printf("%c",input_array[i]);
+            *arg_count = wordlength;
+        }
+
+    } 
+    else
+    {
+        for (int i = 0; i < (int) strlen(input_array); i++)
+        {
+            printf("%c",input_array[i]);
+        }
+        
+    }
+    return input_array;     
+}
 
 int parse_command_data(char input_array[MAX_INPUT_SIZE])
 {
@@ -89,76 +123,95 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
     int pointer_index = 0;
     int i = 0;
     int command_flag = 0;
+    pointer_array[0] = &input_array[0];
 
     // Parsing console input and taking the pointers of the letters after spaces
-    if (i != 0)
+    while (input_array[i] != '\0')
     {
-        if (input_array[i] == ' ')
+        if (i != 0)
         {
-            pointer_array[pointer_index] = &input_array[++i];
-            pointer_index++;
+            if (input_array[i] == ' ')
+            {
+                pointer_array[pointer_index] = &input_array[++i];
+                pointer_index++;
+            }
+            else
+            {
+                i++;
+            }
         }
         else
         {
+            pointer_array[pointer_index] = &input_array[0];
             i++;
+            pointer_index++; 
         }
+    }
+
+    // Incorrect input 
+    if (pointer_index == 1) 
+    {
+        pointer_to_command = hash_table_lookup(input_array);
+        if (pointer_to_command != NULL)
+        {
+            pointer_to_command->command_handler(pointer_array);
+        }
+        else printf("\nNo such command found!\n");
+        
+        return 0;
     }
     else
     {
-        pointer_array[pointer_index] = &input_array[0];
-        i++;
-        pointer_index++; 
-    }
-
-    if (command_flag == 0) // Check for command
-    {
-        int command_word_length = pointer_array[1] - pointer_array[0];
-        printf("%p - %p",pointer_array[2], pointer_array[1]);
+        int j = 0;
+        int command_word_length = pointer_array[1] - pointer_array[0] - 1;
         char tmp_array [command_word_length];
-        
-        for (int j = 0; j < command_word_length; j++)
+
+        for (j = 0; j < command_word_length; j++)
         {
             tmp_array[j] = input_array[j];
-            printf("%c",input_array[j]);
         }
+        tmp_array[j] = '\0';
+
+        // Searching hash table
         pointer_to_command = hash_table_lookup(tmp_array);
         if (pointer_to_command == NULL)
         {
             printf("No such command found!\n");
-            printf("Given Command: %s", tmp_array);
+            printD("Given command",tmp_array);
             i = 0; 
             return 0;
         }
         else
         {
-            printf("Found command: %s\n", pointer_to_command->command_name);
+            printD("Command Found",tmp_array);
             command_flag = 1;    
             
         }     
-    }
-    else if (command_flag == 1) // Check for --help
-    {
-        int help_word_length = pointer_array[2] - pointer_array[1];
-        char tmp_array [help_word_length];
-        
-        for (int j = 0; j < help_word_length; j++)
-        {
-            tmp_array[j] = input_array[j];
-        }
 
-        if (strcmp(tmp_array, "--help") == 0)
+        if (command_flag == 1) // Check for --help"
         {
-            pointer_to_command->command_helper(pointer_array);
+            char tmp_array [HELP_WORD_LENGTH];
+            int j = 0;
+            char* start_of_help = pointer_array[1];
+    
+            for (j = 0; j < HELP_WORD_LENGTH; j++)
+            {
+                tmp_array[j] = *(start_of_help + j);
+            }
+            tmp_array[j] = '\0';
+
+            if (strcmp(tmp_array, "--help") == 0)
+            {
+                printD("Executed","Helper");
+                pointer_to_command->command_helper(pointer_array);
+            }
+            else
+            {
+                printD("Executed","Handler");
+                pointer_to_command->command_handler(pointer_array);
+            }   
         }
-        else
-        {
-            pointer_to_command->command_handler(pointer_array);
-        }
-        
     }
-    
-    
-    
 }
 
 int main(void)
@@ -177,32 +230,50 @@ int main(void)
     hash_table_insert(&divd);
     hash_table_insert(&clear);
     
-    while (1)
+    printf("->");
+    while (arg_count < MAX_INPUT_SIZE)
     {
-        c = getch();               
+        c = getch();   
         
-        if (c == BACKSPACE) // Backspace
-        {   
-            printf("\b \b"); 
-            input_array[arg_count] = ' ';
-            arg_count --;
-
+        if (c == BACKSPACE_ASCII) // BACKSPACE_ASCII
+        {               
+            if (arg_count>0) 
+            {
+                printf("\b \b"); 
+                input_array[arg_count] = '\0';
+                arg_count --;
+            }
         }
-        else if (c == CTRLC) return 0; // Ctrl + C to exit
-        else if (c == TAB && c_prev == TAB) // List possibilities
+        else if (c == CTRLC_ASCII) return 0; // Ctrl + C to exit
+        else if (c == TAB_ASCII && c_prev == TAB_ASCII) // List possibilities
         {
-            //list_possible_commands(input_array, commands);
+            input_array[arg_count] = '\0';
+            list_possible_commands(input_array, commands, &arg_count);
             c_prev = ' ';   
         }
-        else if (c == TAB) // Tab
+        else if (c == TAB_ASCII) // Tab
         {
             c_prev = c;
         }  
-        else if (c == ENTER) // Enter
+        else if (c == ENTER_ASCII) // Enter
         {
-            arg_count = 0;
-            parse_command_data(input_array);   
+            if (arg_count == 0) printf("\n");
+            else
+            {
+                input_array[arg_count] = '\0';
+                arg_count = 0;
+                parse_command_data(input_array);   
+            }
+            
+            printf("->");
         }
+        else if (arg_count == MAX_INPUT_SIZE - 1)
+        {
+            if (c != BACKSPACE_ASCII || c != ENTER_ASCII)
+            {
+                input_array[MAX_INPUT_SIZE - 2] = c; 
+            }
+        }            
         else // Save the char
         {
             input_array[arg_count] = c;

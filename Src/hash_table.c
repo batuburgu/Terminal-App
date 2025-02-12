@@ -4,16 +4,16 @@
 #include "string.h"
 #include "hash_table.h"
 
-Action* hash_table[HASH_TABLE_SIZE];
+Command* hash_table[HASH_TABLE_SIZE];
 
-int hash(const char* action_name)
+int hash(const char* command_name)
 {
-    int length = strlen(action_name);
+    int length = strlen(command_name);
     int hash_value = 0;
     for (int i = 0; i < length; i++)
     {
-        hash_value += action_name[i];
-        hash_value = (hash_value * action_name[i]) % HASH_TABLE_SIZE;
+        hash_value += command_name[i];
+        hash_value = (hash_value * command_name[i]) % HASH_TABLE_SIZE;
     }
     return hash_value;
 }
@@ -27,7 +27,7 @@ int init_hash_table(void)
     return 1;
 }
 
-int hash_table_insert(const Action* p)
+int hash_table_insert(const Command* p)
 {
     if (p == NULL)
     {
@@ -36,7 +36,7 @@ int hash_table_insert(const Action* p)
     }
     else
     {
-        int index = hash(p->action_name);
+        int index = hash(p->command_name);
 
         if (hash_table[index] != NULL)
         {
@@ -52,12 +52,12 @@ int hash_table_insert(const Action* p)
     }
 }
 
-Action* hash_table_lookup(char* action_name)
+Command* hash_table_lookup(char* command_name)
 {
-    int index = hash(action_name);
+    int index = hash(command_name);
 
-    // Return the pointer of the struct if the action exists in the table
-    if (hash_table[index] != NULL && strcmp(action_name, hash_table[index]->action_name) == 0)
+    // Return the pointer of the struct if the command exists in the table
+    if (hash_table[index] != NULL && strcmp(command_name, hash_table[index]->command_name) == 0)
     {
         return hash_table[index];
     }

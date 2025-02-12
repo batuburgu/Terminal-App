@@ -5,8 +5,8 @@ CFLAGS  = -I Inc -Wall -Wextra -std=c99
 # Klasör ve dosya tanımlamaları
 SRCDIR  = Src
 OBJDIR  = Obj
-SOURCES = $(SRCDIR)/action_handler.c $(SRCDIR)/hash_table.c $(SRCDIR)/main.c
-OBJECTS = $(OBJDIR)/action_handler.o $(OBJDIR)/hash_table.o $(OBJDIR)/main.o
+SOURCES = $(SRCDIR)/command_handler.c $(SRCDIR)/hash_table.c $(SRCDIR)/main.c
+OBJECTS = $(OBJDIR)/command_handler.o $(OBJDIR)/hash_table.o $(OBJDIR)/main.o
 
 # Nihai hedef: main.exe
 main.exe: $(OBJECTS)
