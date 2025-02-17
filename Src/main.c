@@ -47,10 +47,11 @@ Command divd = COMMAND_CREATOR(&div_function, "divd", &div_helper_function);
 Command divide = COMMAND_CREATOR(&div_function, "divide", &div_helper_function);
 Command division = COMMAND_CREATOR(&div_function, "division", &div_helper_function);
 Command clear = COMMAND_CREATOR(&clear_function, "clear", &clear_helper_function);
+Command help = COMMAND_CREATOR(&help_function, "clear", &clear_helper_function);
 
-Command* commands [] = {&add, &addition, &subs, &substract, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear};
+Command* commands [] = {&add, &addition, &subs, &substract, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear, &help};
 
-#define NUMBER_OF_COMMANDS 11
+#define NUMBER_OF_COMMANDS sizeof(commands)/sizeof(Command*)
 
 const char help_command [6] = "--help";
 
