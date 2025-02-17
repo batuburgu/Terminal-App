@@ -33,8 +33,7 @@
      .command_helper = helper_function                                      \
     };
 
-char input_array[MAX_INPUT_SIZE];
-
+// Declaration of commands
 const Command add = COMMAND_CREATOR(&add_function, "add", &add_helper_function);
 const Command addition = COMMAND_CREATOR(&add_function, "addition", &add_helper_function);
 const Command subs = COMMAND_CREATOR(&subs_function, "subs", &subs_helper_function);
@@ -50,11 +49,13 @@ const Command help = COMMAND_CREATOR(&help_function, "help", &clear_helper_funct
 
 const Command* commands [] = {&add, &addition, &subs, &substract, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear, &help};
 
-int NUMBER_OF_COMMANDS = sizeof(commands) / sizeof(Command*);
-
+// Global Variables
+char input_array[MAX_INPUT_SIZE];
 const char help_command [] = "--help";
+const int NUMBER_OF_COMMANDS = sizeof(commands) / sizeof(Command*);
+int number_of_inputs = 0;
 
-char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* commands[NUMBER_OF_COMMANDS], int* arg_count)
+char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* command_list[NUMBER_OF_COMMANDS], int* arg_count)
 {
     int possible_commands [NUMBER_OF_COMMANDS];
     for (int i = 0; i < (int) NUMBER_OF_COMMANDS; i++)
@@ -70,22 +71,23 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
     {
         for (int k = 0; k < (int) strlen(input_array); k++)
         {
-            if (k > (int) strlen(commands[j]->command_name) && possible_commands[j] == 1) // input is longer than command
+            if (k > (int) strlen(command_list[j]->command_name) && possible_commands[j] == 1) // input is longer than command
             {
-                printD("Input is longer than command:",commands[j]->command_name);
+                printD("Input is longer than command:",command_list[j]->command_name);
                 possible_commands[j] = 0;
             }
-            else if(input_array[k] != commands[j]->command_name[k] && possible_commands[j] == 1) // check for letter difference
+            else if (input_array[k] != command_list[j]->command_name[k] && possible_commands[j] == 1) // check for letter difference
             {   
-                printD("Letter difference:",commands[j]->command_name);
+                printD("Letter difference:",command_list[j]->command_name);
                 possible_commands[j] = 0;
             }
         }
+        
         if (possible_commands[j] == 1)
         {
             indexes[sum] = j;
             sum++;
-            printf("%s ",commands[j]->command_name);
+            printf("%s ",command_list[j]->command_name);
         }           
     }
 
@@ -102,12 +104,12 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
     else if (sum == 1) 
     {
         int index = indexes[0];
-        int wordlength = strlen(commands[index]->command_name);
-        printD("One command found", commands[index]->command_name);
+        int wordlength = strlen(command_list[index]->command_name);
+        printD("One command found", command_list[index]->command_name);
         printf("\n->");
         for (int i = 0; i < wordlength; i++)
         {
-            input_array[i] = commands[index]->command_name[i];
+            input_array[i] = command_list[index]->command_name[i];
             printf("%c",input_array[i]); 
         }
         *arg_count = wordlength;
@@ -129,7 +131,6 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
 {
     Command* pointer_to_command = NULL; 
     char* pointer_array[MAX_INPUT_SIZE];
-    int pointer_index = 0;
     int i = 0;
     int command_flag = 0;
     pointer_array[0] = &input_array[0];
@@ -141,8 +142,10 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
         {
             if (input_array[i] == ' ')
             {
-                pointer_array[pointer_index] = &input_array[++i];
-                pointer_index++;
+                pointer_array[number_of_inputs] = &input_array[++i];
+                printf("Inserted Address:%p, Character:%c, Index:%d\n", pointer_array[number_of_inputs], *pointer_array[number_of_inputs],number_of_inputs);     
+                number_of_inputs++;
+                
             }
             else
             {
@@ -151,14 +154,14 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
         }
         else
         {
-            pointer_array[pointer_index] = &input_array[0];
+            pointer_array[number_of_inputs] = &input_array[0];
             i++;
-            pointer_index++; 
+            number_of_inputs++; 
+            printf("%p, %c\n",&input_array[0],input_array[0]);   
         }
     }
-
     // Command only and incorrect inputs
-    if (pointer_index == 1) 
+    if (number_of_inputs == 1) 
     {
         printD("Input arr",input_array);
         pointer_to_command = hash_table_lookup(input_array);
@@ -172,7 +175,10 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
     }
     else
     {
+        printD("Else", "Girdim");
         int j = 0;
+        printf("I1:%p", pointer_array[1]);
+        printf("I0:%p", pointer_array[0]);
         int command_word_length = pointer_array[1] - pointer_array[0] - 1;
         char tmp_array [command_word_length];
 
@@ -181,7 +187,7 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
             tmp_array[j] = input_array[j];
         }
         tmp_array[j] = '\0';
-
+        printD("Burayi", "Gectim");
         // Searching hash table
         pointer_to_command = hash_table_lookup(tmp_array);
         if (pointer_to_command == NULL)
@@ -200,6 +206,7 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
 
         if (command_flag == 1) // Check for --help"
         {
+            printD("Command Flag", "1");
             char tmp_array [HELP_WORD_LENGTH];
             int j = 0;
             char* start_of_help = pointer_array[1];
@@ -240,7 +247,7 @@ int main(void)
     hash_table_insert(&divd);
     hash_table_insert(&clear);
     hash_table_insert(&help);
-    
+
     printf("->");
     while (arg_count < MAX_INPUT_SIZE)
     {

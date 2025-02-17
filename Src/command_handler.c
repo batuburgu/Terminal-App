@@ -7,11 +7,26 @@
 #include "hash_table.h"
 
 extern const Command* commands[];
-extern int NUMBER_OF_COMMANDS;
+extern char* pointer_array[];
+extern const int NUMBER_OF_COMMANDS;
+extern int number_of_inputs;
 
 int add_function(char* pointer_array[])
 {
-    printf("Add Function");
+    for (int i = 1; i < number_of_inputs - 1; i++)
+    {
+        
+        if (pointer_array[i + 1] - pointer_array[i] == 1)
+        {
+
+        }
+        else
+        {
+            //printf("Chosen Address:%p, Character:%c, Index:%d,\n",pointer_array[i],*pointer_array[i],i);
+        }
+               
+    }
+    number_of_inputs = 0;
     return 0;
 }
 
@@ -71,7 +86,7 @@ int clear_helper_function(char* pointer_array[])
 
 int help_function(char* pointer_array[])
 {
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < NUMBER_OF_COMMANDS; i++)
     {
         printf("%s ", commands[i]->command_name);
     }
