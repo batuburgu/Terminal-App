@@ -1,6 +1,7 @@
 #ifndef COMMAND_HANDLER_H
 #define COMMAND_HANDLER_H
 
+
 int add_function(char* pointer_array[]);
 int add_helper_function(char* pointer_array[]);
 int subs_function(char* pointer_array[]);

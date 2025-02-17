@@ -5,8 +5,9 @@
 #include <stdbool.h>
 #include <conio.h>
 #include "main.h"
-#include "command_handler.h"
 #include "hash_table.h"
+#include "command_handler.h"
+
 
 #define CTRLC_ASCII 3
 #define BACKSPACE_ASCII 8
@@ -17,34 +18,39 @@
 #define DEBUG_ENABLE 0
 #if (DEBUG_ENABLE == 1)
     #define printD(str1, str2) do{ \
-        printf("\nFile:%s->", __FILE__);\
-        printf("Line:%d->", __LINE__);\
-        printf("Func:%s->", __func__);\
-        printf("%s:%s\n", str1,str2);\
+        printf("\nFile:%s->", __FILE__);        \
+        printf("Line:%d->", __LINE__);           \
+        printf("Func:%s->", __func__);            \
+        printf("%s:%s\n", str1,str2);              \
     }while(0)
 #else
     #define printD(str1, str2) do{} while(0)
 #endif
 
+#define COMMAND_CREATOR( handler_function, name, helper_function )      \
+    {                                                                    \
+     .command_handler = handler_function,                                 \
+     .command_name = name,                                                 \
+     .command_helper = helper_function                                      \
+    };
 
 char input_array[MAX_INPUT_SIZE];
 
-// Command Definitions
-Command add = {.command_handler = &add_function, .command_name = "add", .command_helper = &add_helper_function};
-Command addition = {.command_handler = &add_function, .command_name = "addition", .command_helper = &add_helper_function};
-Command subs = {.command_handler = &subs_function, .command_name = "subs", .command_helper = &subs_helper_function};
-Command substract = {.command_handler = &subs_function, .command_name = "substract", .command_helper = &subs_helper_function};
-Command multi = {.command_handler = &multi_function, .command_name = "multi", .command_helper = &multi_helper_function};
-Command multiple = {.command_handler = &multi_function, .command_name = "multiple", .command_helper = &multi_helper_function};
-Command multiplication = {.command_handler = &multi_function, .command_name = "multiplication", .command_helper = &multi_helper_function};
-Command divd = {.command_handler = &div_function, .command_name = "divd", .command_helper = &div_helper_function};
-Command divide = {.command_handler = &div_function, .command_name = "divide", .command_helper = &div_helper_function};
-Command division = {.command_handler = &div_function, .command_name = "division", .command_helper = &div_helper_function};
-Command clear = {.command_handler = &clear_function, .command_name = "clear", .command_helper = &clear_helper_function};
+Command add = COMMAND_CREATOR(&add_function, "add", &add_helper_function);
+Command addition = COMMAND_CREATOR(&add_function, "addition", &add_helper_function);
+Command subs = COMMAND_CREATOR(&subs_function, "subs", &subs_helper_function);
+Command substract = COMMAND_CREATOR(&subs_function, "substract", &subs_helper_function);
+Command multi = COMMAND_CREATOR(&multi_function, "multi", &multi_helper_function);
+Command multiple = COMMAND_CREATOR(&multi_function, "multiple", &multi_helper_function);
+Command multiplication = COMMAND_CREATOR(&multi_function, "multiplication", &multi_helper_function);
+Command divd = COMMAND_CREATOR(&div_function, "divd", &div_helper_function);
+Command divide = COMMAND_CREATOR(&div_function, "divide", &div_helper_function);
+Command division = COMMAND_CREATOR(&div_function, "division", &div_helper_function);
+Command clear = COMMAND_CREATOR(&clear_function, "clear", &clear_helper_function);
 
 Command* commands [] = {&add, &addition, &subs, &substract, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear};
 
-#define NUMBER_OF_COMMANDS sizeof(commands)
+#define NUMBER_OF_COMMANDS 11
 
 const char help_command [6] = "--help";
 
@@ -64,12 +70,12 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], Command* commands
     {
         for (int k = 0; k < (int) strlen(input_array); k++)
         {
-            if (k > (int) strlen(commands[j]->command_name)) // input is longer than command
+            if (k > (int) strlen(commands[j]->command_name) && possible_commands[j] == 1) // input is longer than command
             {
                 printD("Input is longer than command:",commands[j]->command_name);
                 possible_commands[j] = 0;
             }
-            else if(input_array[k] != commands[j]->command_name[k]) // check for letter difference
+            else if(input_array[k] != commands[j]->command_name[k] && possible_commands[j] == 1) // check for letter difference
             {   
                 printD("Letter difference:",commands[j]->command_name);
                 possible_commands[j] = 0;
@@ -83,30 +89,33 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], Command* commands
         }           
     }
 
-    printf("\n->");
-
     if (sum == 0)
     {
         printf("No possible commands found!\n");
+        printf("\n->");
         for (int i = 0; i < (int) strlen(input_array); i++)
         {
             printf("%c",input_array[i]);
         }
+        
     } 
     else if (sum == 1) 
     {
         int index = indexes[0];
         int wordlength = strlen(commands[index]->command_name);
+        printD("One command found", commands[index]->command_name);
+        printf("\n->");
         for (int i = 0; i < wordlength; i++)
         {
             input_array[i] = commands[index]->command_name[i];
-            printf("%c",input_array[i]);
-            *arg_count = wordlength;
+            printf("%c",input_array[i]); 
         }
-
+        *arg_count = wordlength;
+        
     } 
     else
     {
+        printf("\n->");
         for (int i = 0; i < (int) strlen(input_array); i++)
         {
             printf("%c",input_array[i]);
@@ -148,9 +157,10 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
         }
     }
 
-    // Incorrect input 
+    // Command only and incorrect inputs
     if (pointer_index == 1) 
     {
+        printD("Input arr",input_array);
         pointer_to_command = hash_table_lookup(input_array);
         if (pointer_to_command != NULL)
         {
@@ -249,7 +259,7 @@ int main(void)
         {
             input_array[arg_count] = '\0';
             list_possible_commands(input_array, commands, &arg_count);
-            c_prev = ' ';   
+            c_prev = ' '; 
         }
         else if (c == TAB_ASCII) // Tab
         {
@@ -260,6 +270,7 @@ int main(void)
             if (arg_count == 0) printf("\n");
             else
             {
+                printf("\n");
                 input_array[arg_count] = '\0';
                 arg_count = 0;
                 parse_command_data(input_array);   

@@ -6,8 +6,6 @@
 #include "command_handler.h"
 #include "hash_table.h"
 
-extern Command* commands;
-
 int add_function(char* pointer_array[])
 {
     printf("Add Function\n");
@@ -70,14 +68,6 @@ int clear_helper_function(char* pointer_array[])
 
 int help_function(char* pointer_array[])
 {
-    int number_of_commands = sizeof(commands);
-    
-    for (int i = 0; i < number_of_commands; i++)
-    {
-        printf("Commands: ");
-        //printf("%s ", commands[i]->command_name);
-    }
-    printf("\n");
-    
+    printf("Help Function");
     return 0;
 }
