@@ -8,7 +8,6 @@
 #include "hash_table.h"
 #include "command_handler.h"
 
-
 #define CTRLC_ASCII 3
 #define BACKSPACE_ASCII 8
 #define TAB_ASCII 9
@@ -36,26 +35,26 @@
 
 char input_array[MAX_INPUT_SIZE];
 
-Command add = COMMAND_CREATOR(&add_function, "add", &add_helper_function);
-Command addition = COMMAND_CREATOR(&add_function, "addition", &add_helper_function);
-Command subs = COMMAND_CREATOR(&subs_function, "subs", &subs_helper_function);
-Command substract = COMMAND_CREATOR(&subs_function, "substract", &subs_helper_function);
-Command multi = COMMAND_CREATOR(&multi_function, "multi", &multi_helper_function);
-Command multiple = COMMAND_CREATOR(&multi_function, "multiple", &multi_helper_function);
-Command multiplication = COMMAND_CREATOR(&multi_function, "multiplication", &multi_helper_function);
-Command divd = COMMAND_CREATOR(&div_function, "divd", &div_helper_function);
-Command divide = COMMAND_CREATOR(&div_function, "divide", &div_helper_function);
-Command division = COMMAND_CREATOR(&div_function, "division", &div_helper_function);
-Command clear = COMMAND_CREATOR(&clear_function, "clear", &clear_helper_function);
-Command help = COMMAND_CREATOR(&help_function, "clear", &clear_helper_function);
+const Command add = COMMAND_CREATOR(&add_function, "add", &add_helper_function);
+const Command addition = COMMAND_CREATOR(&add_function, "addition", &add_helper_function);
+const Command subs = COMMAND_CREATOR(&subs_function, "subs", &subs_helper_function);
+const Command substract = COMMAND_CREATOR(&subs_function, "substract", &subs_helper_function);
+const Command multi = COMMAND_CREATOR(&multi_function, "multi", &multi_helper_function);
+const Command multiple = COMMAND_CREATOR(&multi_function, "multiple", &multi_helper_function);
+const Command multiplication = COMMAND_CREATOR(&multi_function, "multiplication", &multi_helper_function);
+const Command divd = COMMAND_CREATOR(&div_function, "divd", &div_helper_function);
+const Command divide = COMMAND_CREATOR(&div_function, "divide", &div_helper_function);
+const Command division = COMMAND_CREATOR(&div_function, "division", &div_helper_function);
+const Command clear = COMMAND_CREATOR(&clear_function, "clear", &clear_helper_function);
+const Command help = COMMAND_CREATOR(&help_function, "help", &clear_helper_function);
 
-Command* commands [] = {&add, &addition, &subs, &substract, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear, &help};
+const Command* commands [] = {&add, &addition, &subs, &substract, &multi, &multiple, &multiplication, &divd, &divide, &division, &clear, &help};
 
-#define NUMBER_OF_COMMANDS sizeof(commands)/sizeof(Command*)
+int NUMBER_OF_COMMANDS = sizeof(commands) / sizeof(Command*);
 
-const char help_command [6] = "--help";
+const char help_command [] = "--help";
 
-char* list_possible_commands(char input_array[MAX_INPUT_SIZE], Command* commands[NUMBER_OF_COMMANDS], int* arg_count)
+char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* commands[NUMBER_OF_COMMANDS], int* arg_count)
 {
     int possible_commands [NUMBER_OF_COMMANDS];
     for (int i = 0; i < (int) NUMBER_OF_COMMANDS; i++)
@@ -240,6 +239,7 @@ int main(void)
     hash_table_insert(&multi);
     hash_table_insert(&divd);
     hash_table_insert(&clear);
+    hash_table_insert(&help);
     
     printf("->");
     while (arg_count < MAX_INPUT_SIZE)
@@ -277,7 +277,7 @@ int main(void)
                 parse_command_data(input_array);   
             }
             
-            printf("->");
+            printf("\n->");
         }
         else if (arg_count == MAX_INPUT_SIZE - 1)
         {
