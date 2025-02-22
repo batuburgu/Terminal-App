@@ -12,6 +12,7 @@
 #define BACKSPACE_ASCII 8
 #define TAB_ASCII 9
 #define ENTER_ASCII 13
+#define SPACE_ASCII 32
 #define HELP_WORD_LENGTH 6
 
 #define DEBUG_ENABLE 0
@@ -53,7 +54,15 @@ const Command* commands [] = {&add, &addition, &subs, &substract, &multi, &multi
 char input_array[MAX_INPUT_SIZE];
 const char help_command [] = "--help";
 const int NUMBER_OF_COMMANDS = sizeof(commands) / sizeof(Command*);
-int number_of_inputs = 0;
+
+terminal_data* add_new_data(char* pointer)
+{
+    terminal_data *new_data = (terminal_data *) malloc(sizeof(terminal_data));
+    
+    new_data->data_pointer = pointer;
+    new_data->word_length = 0;
+    return new_data;
+}
 
 char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* command_list[NUMBER_OF_COMMANDS], int* arg_count)
 {
@@ -64,7 +73,7 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
     }
      
     int sum = 0;
-    int indexes [5];
+    int indexes [NUMBER_OF_COMMANDS];
 
     printf("\nPossible commands:\n");   
     for (int j = 0; j < (int) NUMBER_OF_COMMANDS; j++)
@@ -82,8 +91,7 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
                 possible_commands[j] = 0;
             }
         }
-        
-        if (possible_commands[j] == 1)
+        if (possible_commands[j] == 1) // Displays the possible commands and saves their indexes
         {
             indexes[sum] = j;
             sum++;
@@ -91,7 +99,7 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
         }           
     }
 
-    if (sum == 0)
+    if (sum == 0) // No possible commands found 
     {
         printf("No possible commands found!\n");
         printf("\n->");
@@ -101,7 +109,7 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
         }
         
     } 
-    else if (sum == 1) 
+    else if (sum == 1) // There is only one possible command, save the possible command to input_array and display it again
     {
         int index = indexes[0];
         int wordlength = strlen(command_list[index]->command_name);
@@ -115,7 +123,7 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
         *arg_count = wordlength;
         
     } 
-    else
+    else // More than one possible commands, display the current input to screen
     {
         printf("\n->");
         for (int i = 0; i < (int) strlen(input_array); i++)
@@ -130,41 +138,52 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
 int parse_command_data(char input_array[MAX_INPUT_SIZE])
 {
     Command* pointer_to_command = NULL; 
-    char* pointer_array[MAX_INPUT_SIZE];
-    int i = 0;
+
+    terminal_data* pointer_array[MAX_INPUT_SIZE];
+    pointer_array[0] = add_new_data(&input_array[0]);
+
+    int i = 1;
     int command_flag = 0;
-    pointer_array[0] = &input_array[0];
+    int length = 1;
+    int number_of_inputs = 1;
 
     // Parsing console input and taking the pointers of the letters after spaces
     while (input_array[i] != '\0')
     {
-        if (i != 0)
+        if (input_array[i] == SPACE_ASCII && input_array[i+1] != SPACE_ASCII)
+        {   
+            pointer_array[number_of_inputs - 1]->word_length = length;
+            length = 1;
+
+            pointer_array[number_of_inputs] = add_new_data(&input_array[++i]);
+            number_of_inputs++;
+            
+        }
+        else if (input_array[i] != SPACE_ASCII)
         {
-            if (input_array[i] == ' ')
-            {
-                pointer_array[number_of_inputs] = &input_array[++i];
-                printf("Inserted Address:%p, Character:%c, Index:%d\n", pointer_array[number_of_inputs], *pointer_array[number_of_inputs],number_of_inputs);     
-                number_of_inputs++;
-                
-            }
-            else
-            {
-                i++;
-            }
+            i++;
+            length++;
         }
         else
         {
-            pointer_array[number_of_inputs] = &input_array[0];
             i++;
-            number_of_inputs++; 
-            printf("%p, %c\n",&input_array[0],input_array[0]);   
         }
+        
     }
+    pointer_array[number_of_inputs-1]->word_length = length; // assigning final input length
+
     // Command only and incorrect inputs
     if (number_of_inputs == 1) 
     {
-        printD("Input arr",input_array);
-        pointer_to_command = hash_table_lookup(input_array);
+        int command_length = pointer_array[0]->word_length;
+        char tmp_array [command_length];
+        for (int j = 0; j < command_length; j++)
+        {
+            tmp_array[j] = input_array[j];
+        }
+
+        printf("Input arr:%s", tmp_array);
+        pointer_to_command = hash_table_lookup(tmp_array);
         if (pointer_to_command != NULL)
         {
             pointer_to_command->command_handler(pointer_array);
@@ -177,9 +196,7 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
     {
         printD("Else", "Girdim");
         int j = 0;
-        printf("I1:%p", pointer_array[1]);
-        printf("I0:%p", pointer_array[0]);
-        int command_word_length = pointer_array[1] - pointer_array[0] - 1;
+        int command_word_length = pointer_array[0]->word_length;
         char tmp_array [command_word_length];
 
         for (j = 0; j < command_word_length; j++)
@@ -187,7 +204,9 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
             tmp_array[j] = input_array[j];
         }
         tmp_array[j] = '\0';
+
         printD("Burayi", "Gectim");
+
         // Searching hash table
         pointer_to_command = hash_table_lookup(tmp_array);
         if (pointer_to_command == NULL)
@@ -209,7 +228,7 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
             printD("Command Flag", "1");
             char tmp_array [HELP_WORD_LENGTH];
             int j = 0;
-            char* start_of_help = pointer_array[1];
+            char* start_of_help = pointer_array[1]->data_pointer;
     
             for (j = 0; j < HELP_WORD_LENGTH; j++)
             {
@@ -229,6 +248,7 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
             }   
         }
     }
+    return 0;
 }
 
 int main(void)

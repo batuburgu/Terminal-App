@@ -6,9 +6,9 @@
 #define MAX_INPUT_SIZE 200
 
 typedef struct Command{
-    int (*command_handler)(char* pointer_array[MAX_INPUT_SIZE]);
+    int (*command_handler)(terminal_data* pointer_array[MAX_INPUT_SIZE]);
     const char command_name[MAX_COMMAND_NAME_LENGTH];
-    int (*command_helper)(char* pointer_array[MAX_INPUT_SIZE]);
+    int (*command_helper)(terminal_data* pointer_array[MAX_INPUT_SIZE]);
 }Command;
 
 extern Command * hash_table[HASH_TABLE_SIZE];

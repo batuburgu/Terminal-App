@@ -2,10 +2,9 @@
 #define MAIN_H
 
 //Linked List Structure
-typedef struct Node{
-    char data;
-    struct Node* next;
-    struct Node* prev;
-} Node;
+typedef struct terminal_data{
+    char* data_pointer;
+    int word_length;
+} terminal_data;
 
 #endif

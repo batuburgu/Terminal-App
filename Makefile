@@ -1,6 +1,6 @@
 # Derleyici ve bayraklar
 CC      = gcc
-CFLAGS  = -I Inc -Wall -Wextra -std=c99
+CFLAGS  = -g -O0 -I Inc -Wall -Wextra -std=c99
 
 # Klasör ve dosya tanımlamaları
 SRCDIR  = Src
