@@ -7,18 +7,17 @@
 #include "hash_table.h"
 
 extern const Command* commands[];
-extern char* pointer_array[];
 extern const int NUMBER_OF_COMMANDS;
 
 int add_function(terminal_data* pointer_array[])
 {
-
     printf("Add function");
     return 0;
 }
 
 int add_helper_function(terminal_data* pointer_array[])
 {
+    long deneme;
     printf("Add Helper Function");
     return 0;
 }

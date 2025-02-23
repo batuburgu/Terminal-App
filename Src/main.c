@@ -15,16 +15,16 @@
 #define SPACE_ASCII 32
 #define HELP_WORD_LENGTH 6
 
-#define DEBUG_ENABLE 0
+#define DEBUG_ENABLE 1
 #if (DEBUG_ENABLE == 1)
-    #define printD(str1, str2) do{ \
+    #define printD(str) do{ \
         printf("\nFile:%s->", __FILE__);        \
         printf("Line:%d->", __LINE__);           \
         printf("Func:%s->", __func__);            \
-        printf("%s:%s\n", str1,str2);              \
+        printf("Log:%s\n", str);              \
     }while(0)
 #else
-    #define printD(str1, str2) do{} while(0)
+    #define printD(str) do{} while(0)
 #endif
 
 #define COMMAND_CREATOR( handler_function, name, helper_function )      \
@@ -82,12 +82,12 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
         {
             if (k > (int) strlen(command_list[j]->command_name) && possible_commands[j] == 1) // input is longer than command
             {
-                printD("Input is longer than command:",command_list[j]->command_name);
+                printD("Input is longer than command");
                 possible_commands[j] = 0;
             }
             else if (input_array[k] != command_list[j]->command_name[k] && possible_commands[j] == 1) // check for letter difference
             {   
-                printD("Letter difference:",command_list[j]->command_name);
+                printD("Letter difference");
                 possible_commands[j] = 0;
             }
         }
@@ -113,7 +113,7 @@ char* list_possible_commands(char input_array[MAX_INPUT_SIZE], const Command* co
     {
         int index = indexes[0];
         int wordlength = strlen(command_list[index]->command_name);
-        printD("One command found", command_list[index]->command_name);
+        printD("One command found");
         printf("\n->");
         for (int i = 0; i < wordlength; i++)
         {
@@ -194,7 +194,7 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
     }
     else
     {
-        printD("Else", "Girdim");
+        printD("Else");
         int j = 0;
         int command_word_length = pointer_array[0]->word_length;
         char tmp_array [command_word_length];
@@ -205,27 +205,24 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
         }
         tmp_array[j] = '\0';
 
-        printD("Burayi", "Gectim");
-
         // Searching hash table
         pointer_to_command = hash_table_lookup(tmp_array);
         if (pointer_to_command == NULL)
         {
             printf("No such command found!\n");
-            printD("Given command",tmp_array);
+            printD("Given command");
             i = 0; 
             return 0;
         }
         else
         {
-            printD("Command Found",tmp_array);
+            printD("Command Found");
             command_flag = 1;    
             
         }     
 
         if (command_flag == 1) // Check for --help"
         {
-            printD("Command Flag", "1");
             char tmp_array [HELP_WORD_LENGTH];
             int j = 0;
             char* start_of_help = pointer_array[1]->data_pointer;
@@ -238,12 +235,12 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
 
             if (strcmp(tmp_array, "--help") == 0)
             {
-                printD("Executed","Helper");
+                printD("Executed Helper");
                 pointer_to_command->command_helper(pointer_array);
             }
             else
             {
-                printD("Executed","Handler");
+                printD("Executed Handler");
                 pointer_to_command->command_handler(pointer_array);
             }   
         }
