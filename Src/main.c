@@ -13,7 +13,11 @@
 #define TAB_ASCII 9
 #define ENTER_ASCII 13
 #define SPACE_ASCII 32
+#define TERMINATOR_ASCII 0
 #define HELP_WORD_LENGTH 6
+
+#define LEFT_ARROW_KEY 75
+#define RIGHT_ARROW_KEY 77
 
 #define DEBUG_ENABLE 1
 #if (DEBUG_ENABLE == 1)
@@ -153,7 +157,7 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
         if (input_array[i] == SPACE_ASCII && input_array[i+1] != SPACE_ASCII)
         {   
             pointer_array[number_of_inputs - 1]->word_length = length;
-            length = 1;
+            length = 0;
 
             pointer_array[number_of_inputs] = add_new_data(&input_array[++i]);
             number_of_inputs++;
@@ -171,6 +175,7 @@ int parse_command_data(char input_array[MAX_INPUT_SIZE])
         
     }
     pointer_array[number_of_inputs-1]->word_length = length; // assigning final input length
+    pointer_array[number_of_inputs] = add_new_data(NULL); 
 
     // Command only and incorrect inputs
     if (number_of_inputs == 1) 
@@ -286,13 +291,35 @@ int main(void)
             list_possible_commands(input_array, commands, &arg_count);
             c_prev = ' '; 
         }
+        else if (c_prev == TERMINATOR_ASCII)
+        {
+            if (c == LEFT_ARROW_KEY)
+            {
+                printf("\033[D");
+                arg_count --;
+            }
+            else if (c == RIGHT_ARROW_KEY)
+            {
+                printf("\033[C");
+                arg_count ++;
+            }            
+            c_prev = ' ';
+        }
         else if (c == TAB_ASCII) // Tab
         {
             c_prev = c;
         }  
+        else if (c == TERMINATOR_ASCII)
+        {
+            c_prev = c;
+        }
         else if (c == ENTER_ASCII) // Enter
         {
-            if (arg_count == 0) printf("\n");
+            if (arg_count == 0)
+            {
+                //nothing
+            }
+            
             else
             {
                 printf("\n");

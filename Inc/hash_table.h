@@ -5,6 +5,8 @@
 #define HASH_TABLE_SIZE 19
 #define MAX_INPUT_SIZE 200
 
+#include "main.h"
+
 typedef struct Command{
     int (*command_handler)(terminal_data* pointer_array[MAX_INPUT_SIZE]);
     const char command_name[MAX_COMMAND_NAME_LENGTH];
