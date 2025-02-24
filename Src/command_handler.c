@@ -13,12 +13,12 @@ extern const int NUMBER_OF_COMMANDS;
 #define HYPHEN 45
 #define MINUS 109
 
-#define EIGHT_BIT_IDENTIFIER 113  // ASCII value for 'q'
-#define SHORT_IDENTIFIER 115     // ASCII value for 's'
-#define DEFAULT_IDENTIFIER 100   // ASCII value for 'd'
-#define LONG_IDENTIFIER 108      // ASCII value for 'l'
-#define FLOAT_IDENTIFIER 102     // ASCII value for 'f'
-#define UNSIGNED_IDENTIFIER 117  // ASCII value for 'u'
+#define EIGHT_BIT_IDENTIFIER "-q"  // ASCII value for 'q'
+#define SHORT_IDENTIFIER "-s"     // ASCII value for 's'
+#define DEFAULT_IDENTIFIER "-d"   // ASCII value for 'd'
+#define LONG_IDENTIFIER "-l"      // ASCII value for 'l'
+#define FLOAT_IDENTIFIER "-f"     // ASCII value for 'f'
+#define UNSIGNED_IDENTIFIER "-u"  // ASCII value for 'u'
 
 #define DEFAULT_CASE 0
 #define EIGHT_BIT_CASE 1
@@ -57,23 +57,23 @@ int add_function(terminal_data* pointer_array[])
                 tmp_array[j] = *(pointer_array[i]->data_pointer + j);
             }
             tmp_array[wordlength] = '\0';
-            if (strcmp(tmp_array, "-d") == 0) 
+            if (strcmp(tmp_array, DEFAULT_IDENTIFIER) == 0) 
             {
                 datatype = 0;
             } 
-            else if (strcmp(tmp_array, "-q") == 0) 
+            else if (strcmp(tmp_array, EIGHT_BIT_IDENTIFIER) == 0) 
             {
                 datatype = 1;
             } 
-            else if (strcmp(tmp_array, "-s") == 0) 
+            else if (strcmp(tmp_array, SHORT_IDENTIFIER) == 0) 
             {
                 datatype = 2;
             } 
-            else if (strcmp(tmp_array, "-l") == 0) 
+            else if (strcmp(tmp_array, LONG_IDENTIFIER) == 0) 
             {
                 datatype = 3;
             } 
-            else if (strcmp(tmp_array, "-f") == 0) 
+            else if (strcmp(tmp_array, FLOAT_IDENTIFIER) == 0) 
             {
                 datatype = 4;
             } 
